@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.wishtest">
+  
+  
+  <select id="Check" parameterType="WishVO" resultType="int">
+    SELECT COUNT(*)
+    FROM CUSTOM
+    WHERE TRIM(busi_num) = TRIM(#{busiNumC})
+  </select>
+  
+  
+  <!-- 조회 retrieve-->
+  <select id="doRetrieve" parameterType="SearchVO" resultType="WishVO">
+
+    SELECT  busi_num as busiNumC,
+            custom
+    FROM    CUSTOM
+    WHERE   TRIM(busi_num)  LIKE '%' || #{searchWordBn} || '%'
+    AND      TRIM(custom)    LIKE '%' || #{searchWordC} || '%'
+  </select>
+  
+  
+  <select id="doSelectOne" parameterType="BusiNumVO" resultType="WishVO">
+  <![CDATA[
+   SELECT A.*,B.*
+   FROM (
+    SELECT TRIM(busi_num) as busiNumC,
+           TRIM(custom) as custom ,         
+           TRIM(short) as shortN,              
+           TRIM(ceo) as ceo,      
+           TRIM(charge_person) as chargePerson,        
+           TRIM(busi_condition) AS busiCondition,    
+           TRIM(item) as item,    
+           TRIM(post_num) as postNum,
+           TRIM(addr1) as addr1,
+           TRIM(addr2) as addr2,
+           TRIM(tel) as tel,
+           TRIM(fax) as fax,
+           TRIM(homepage) as homePage,
+           co_yn as coYn,
+           foreign_yn as foreignYn,
+           tax_yn as taxYn,
+           country_eng as countryEng,
+           country_kor as countryKor,
+           special_relation as specialRelation,
+           trade_stop as tradeStop,
+           TO_CHAR(contract_period_s,'yyyy-mm-dd') AS contractPeriodS,
+           TO_CHAR(contract_period_e,'yyyy-mm-dd') AS contractPeriodE,
+           TRIM(regi_info_man) AS regiInfoMan,
+           TO_CHAR(regi_info_date,'yyyy-mm-dd hh24:mi:ss') AS regiInfoDate,
+           TRIM(modi_info_man) AS modiInfoMan,
+           TO_CHAR(modi_info_date,'yyyy-mm-dd hh24:mi:ss') AS modiInfoDate,
+           country
+    FROM CUSTOM   
+    WHERE TRIM(busi_num) = #{busiNumC}
+    )A
+    CROSS JOIN(
+     SELECT busi_num as busiNumA,
+        TRIM(FACTORY) as factory,
+        TRIM(trade_bank) as tradeBank,
+        TRIM(ACCOUNT_NUM) as accountNum
+     FROM ACCOUNT
+     WHERE TRIM(busi_num) = #{busiNumC}
+    )B
+  ]]>  
+  </select>
+  
+  <update id="doUpdate" parameterType="WishVO">
+     UPDATE CUSTOM     
+     SET 
+		busi_num  = #{busiNumC},
+		custom  = #{custom},
+		short  = #{shortN},
+		ceo  = #{ceo},
+		charge_person  = #{chargePerson},
+		busi_condition  = #{busiCondition},
+		item  = #{item},
+		post_num  = #{postNum},
+		addr1  = #{addr1},
+		addr2  = #{addr2},
+		tel  = #{tel},
+		fax  = #{fax},
+		homepage  = #{homePage},
+		co_yn  = #{coYn},
+		foreign_yn  = #{foreignYn},
+		tax_yn  = #{taxYn},
+		country_eng  = #{countryEng},
+		country_kor  = #{countryKor},
+		special_relation  = #{specialRelation},
+		trade_stop  = #{tradeStop},
+		contract_period_s  = TO_CHAR(#{contractPeriodS}),
+		contract_period_e  = TO_CHAR(#{contractPeriodE}),
+		regi_info_man  = #{regiInfoMan},
+		modi_info_man  = #{modiInfoMan},
+		modi_info_date  = SYSDATE,
+		country  = #{country}
+     WHERE TRIM(busi_num) = TRIM(#{busiNumC})
+  </update>
+  <update id="doUpdate2" parameterType="AccountVO">
+     UPDATE account     
+     SET 
+	    busi_num = #{busiNumA},
+	    factory = #{factory},
+	    trade_bank = #{tradeBank},
+	    ACCOUNT_NUM = #{accountNum}
+     WHERE TRIM(busi_num) = TRIM(#{busiNumA})
+  </update>
+  
+  
+    <insert id="doSave2" parameterType="AccountVO">
+INSERT INTO account (
+    busi_num,
+    factory,
+    trade_bank,
+    ACCOUNT_NUM
+) VALUES (
+            #{busiNumA},
+            #{factory},
+            #{tradeBank},
+            #{accountNum}            
+        )
+    </insert>
+	<insert id="doSave" parameterType="WishVO">
+INSERT INTO custom (
+    busi_num,
+    custom,
+    short,
+    ceo,
+    charge_person,
+    busi_condition,
+    item,
+    post_num,
+    addr1,
+    addr2,
+    tel,
+    fax,
+    homepage,
+    co_yn,
+    foreign_yn,
+    tax_yn,
+    country_eng,
+    country_kor,
+    special_relation,
+    trade_stop,
+    contract_period_s,
+    contract_period_e,
+    regi_info_man,
+    regi_info_date,
+    modi_info_man,
+    modi_info_date,
+    country
+) VALUES (
+			#{busiNumC},
+			#{custom},
+			#{shortN},
+			#{ceo},
+			#{chargePerson},
+			#{busiCondition},
+			#{item},
+			#{postNum},
+			#{addr1},
+			#{addr2},
+			#{tel},
+			#{fax},
+			#{homePage},
+			#{coYn},
+			#{foreignYn},
+			#{taxYn},
+			#{countryEng},
+			#{countryKor},
+			#{specialRelation},
+			#{tradeStop},
+            sysdate,
+            sysdate,
+			#{regiInfoMan},
+            sysdate,
+			#{modiInfoMan},
+            sysdate,
+			#{country}
+		)
+	</insert>
+	
+  <delete id="doDelete" parameterType="WishVO">
+    DELETE FROM custom
+    WHERE TRIM(busi_num) = TRIM(#{busiNumC})
+  </delete>
+    <delete id="doDelete2" parameterType="AccountVO">
+    DELETE FROM account
+    WHERE TRIM(busi_num) = TRIM(#{busiNumA})
+  </delete>
+
+</mapper>  
